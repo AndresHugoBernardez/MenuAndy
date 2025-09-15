@@ -10,7 +10,7 @@ Their buttons are
 
 ES: Menu Andy es un menu para dispositivos de pantalla lcd 16x2 con cuatro botones. Es casi como un "sistema operativo".
 Sus botones son:
-* Menu/Aceptar
-* Exit/Cancelar
+* Menú/Aceptar
+* Salir/Cancelar
 * Arriba
 * Abajo
