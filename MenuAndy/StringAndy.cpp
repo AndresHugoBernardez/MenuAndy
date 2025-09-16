@@ -104,7 +104,10 @@ void strcpy_Andy(char* destination, const char *source) {
 
 			k++;
 		}
-
+       if(negative){
+		   cadena[k]='-';
+		   k++;
+	   }
 
 		k--;
 		while (k > -1) {
@@ -120,4 +123,5 @@ void strcpy_Andy(char* destination, const char *source) {
 		destination[i] = '\0';
 
 	}
+
 
