@@ -1253,6 +1253,11 @@ void menuAndy() {
 
 
         switch (Opcions.currentItem->subItems[Opcions.pos].itemType) {
+                    
+        case MENU:
+                    stradd_Andy(cadena1, Opcions.currentItem->subItems[Opcions.pos].itemName);
+                    
+                    break;
 
         case OPTION:
 
@@ -1538,22 +1543,42 @@ char alarma1String[] = "Apertura 1";
 char alarma2String[] = "Cierre 1";
 char alarma3String[] = "Apertura 2";
 char alarma4String[] = "Cierre 2";
-char activarAlarmasString[] = "Sistema";
+char activarAlarmasString[] = "Alarmas";
 char activadaString[] = "Activado";
 char desactivadaString[] = "Desactivado";
 
+char cicloString[]="Ciclo";
+
+char duracionString[]="Duracion";
+char esperaString[]="Espera";
+char activaCicloString[]="Activa Ciclo";
+
+
 
 // Menu principal
-Item  Menu1[6] = {
+Item  Menu1[8] = {
   Item(TIME_ANDY, horaString,2000),
   Item(TIME_ANDY, alarma1String,30),
   Item(TIME_ANDY, alarma2String,60),
   Item(TIME_ANDY, alarma3String,90),
   Item(TIME_ANDY, alarma4String,120),
-  Item(OPTION, activarAlarmasString) };
+  Item(OPTION, activarAlarmasString),
+  Item(MENU,cicloString)
+   };
+    
 
 // Menu OPCIONES
 char * activarOptions[2] = {desactivadaString,activadaString};
+
+//Ciclo
+
+Item menuCiclo[3]={
+   Item(TIME_ANDY,esperaString,20),
+   Item(TIME_ANDY,duracionString,5),
+   Item(OPTION,esperaString)
+};
+
+char * activaCiclo[2]={desactivadaString,activadaString};
 
 
 Item  MenuPrincipal(MENU, "Menu Principal") ;
@@ -1570,7 +1595,7 @@ Item  MenuPrincipal(MENU, "Menu Principal") ;
 /////ARDUINO INO
 
 
-struct tmAndy hora,apertura1,cierre1,apertura2,cierre2;
+struct tmAndy hora,apertura1,cierre1,apertura2,cierre2,auxTime;
 
 int a1angulo = 0;
 
@@ -1593,6 +1618,12 @@ int ImprimeHora = 0;
 unsigned long int tiempoPatron=0;
 unsigned long int auxiliarTime=0;
 
+
+unsigned long int proximaApertura=1;
+unsigned long int proximoCierre=1;
+unsigned long int esperaTime=20;
+unsigned long int duracionTime=5;
+
 Servo servo_9;
 
 
@@ -1600,10 +1631,12 @@ Servo servo_9;
 void setup()
 {
   unsigned long int start=1;
-  MenuPrincipal.allocateItems(6,Menu1);
-
-  Menu1[5].allocateOptions(2,activarOptions);
-
+  MenuPrincipal.allocateItems(7,Menu1);
+menuCiclo[2].allocateOptions(2, activaCiclo );
+  Menu1[5].allocateOptions(2,activarOptions) ;
+  Menu1[6].allocateItems(3,menuCiclo);
+  
+    
   Opcions.Init(&MenuPrincipal, 333);
   Opcions.setButtons(A3,A2,A1,A0);
 
@@ -1651,6 +1684,13 @@ void setup()
 
   
   tiempoPatron=millis()+1000;
+    
+  esperaTime=menuCiclo[0].time*1000;
+  duracionTime=menuCiclo[1].time*1000;
+        
+proximaApertura=millis()+esperaTime;
+proximoCierre=proximaApertura+duracionTime;
+  
 }
 
 void loop()
@@ -1724,6 +1764,27 @@ if(MenuPrincipal.subItems[5].Pos==1)
   }
 }
 
+    
+    
+    // Ciclo
+    
+    if (menuCiclo[2].Pos==1) {
+        
+        if (auxiliarTime>proximaApertura){
+        if (auxiliarTime<proximoCierre){
+            
+            servo_9.write(90);
+        }
+        else{
+                servo_9.write(0);
+                
+                proximaApertura = auxiliarTime+esperaTime;
+                proximoCierre = proximaApertura+duracionTime;
+            }
+         }
+        
+      
+    }
   
   
   ///ENTRADA AL MENU
@@ -1747,6 +1808,13 @@ if(MenuPrincipal.subItems[5].Pos==1)
   localtimeAndy(&cierre1, &(MenuPrincipal.subItems[2].time)); 
   localtimeAndy(&apertura2,&(MenuPrincipal.subItems[3].time)); 
   localtimeAndy(&cierre2, &(MenuPrincipal.subItems[4].time)); 
+        
+  
+esperaTime=menuCiclo[0].time*1000;
+duracionTime=menuCiclo[1].time*1000;
+        
+proximaApertura=millis()+esperaTime;
+proximoCierre=proximaApertura+duracionTime;
 
    
    //Reconstruir pantalla
