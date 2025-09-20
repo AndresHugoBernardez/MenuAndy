@@ -47,6 +47,10 @@ void menuAndy() {
 
 
         switch (Opcions.currentItem->subItems[Opcions.pos].itemType) {
+		case MENU:
+
+          stradd_Andy(cadena1, Opcions.currentItem->subItems[Opcions.pos].itemName);
+			break;
 
         case OPTION:
 
@@ -457,3 +461,4 @@ if(MenuPrincipal.subItems[5].Pos==1)
   
   delay(10); // Wait for 10 millisecond(s)
 }
+
